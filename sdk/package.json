@@ -1,10 +1,11 @@
 {
-  "name": "sdk",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+   "name": "dodo-checkout-sdk",
+  "version": "0.1.0",
+  "main": "dist/dodo-checkout.js",
+  "types": "dist/dodo-checkout.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+   "build": "tsup src/dodo-checkout.ts --format iife --minify",
+    "dev": "tsup src/dodo-checkout.ts --format iife --watch"
   },
   "keywords": [],
   "author": "",
