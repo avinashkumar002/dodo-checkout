@@ -1,3 +1,5 @@
+import { getProduct } from "./lib/products";
+import { ProductStep } from "./components/ProductStep";
 import { useEffect, useState } from "react";
 import { readSessionParams } from "./lib/session";
 import { bridge } from "./lib/bridge";
@@ -31,10 +33,21 @@ function App() {
     return <div className="checkout-shell checkout-shell--loading">Loading…</div>;
   }
 
+  const product = session ? getProduct(session.productId) : null;
+
+  if (session && !product) {
+    return (
+      <div className="checkout-shell checkout-shell--error">
+        <p>Unknown product.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="checkout-shell">
-      {step === "product" && <p>Product: {session.productId}</p>}
-      {/* ProductStep / EmailStep / CardStep / ResultStep wired in next steps */}
+      {step === "product" && product && (
+        <ProductStep product={product} onContinue={() => setStep("email")} />
+      )}
     </div>
   );
 }
