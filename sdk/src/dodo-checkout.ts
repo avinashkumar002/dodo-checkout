@@ -33,7 +33,7 @@ export type DodoOpenOptions = {
 
 // In a real deployment this would be the fixed origin of the hosted checkout app.
 // Left overridable via a data-attribute on the script tag for local/dev testing.
-const DEFAULT_CHECKOUT_ORIGIN = "https://checkout.dodopayments.example";
+const DEFAULT_CHECKOUT_ORIGIN = "https://checkout-app-iota-wheat.vercel.app";
 
 type InboundMessage =
   | { type: "dodo:ready"; sessionId: string }
