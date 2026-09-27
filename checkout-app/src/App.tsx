@@ -5,6 +5,7 @@ import { getProduct } from "./lib/products";
 import { ProductStep } from "./components/ProductStep";
 import { EmailStep } from "./components/EmailStep";
 import { CardStep } from "./components/CardStep";
+import { ResultStep } from "./components/ResultStep";
 import type { SessionParams, CheckoutStep } from "./types";
 import "./index.css";
 
@@ -13,6 +14,7 @@ function App() {
   const [invalid, setInvalid] = useState(false);
   const [step, setStep] = useState<CheckoutStep>("product");
   const [email, setEmail] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const parsed = readSessionParams();
@@ -51,6 +53,7 @@ function App() {
       {step === "product" && (
         <ProductStep product={product} onContinue={() => setStep("email")} />
       )}
+
       {step === "email" && (
         <EmailStep
           onBack={() => setStep("product")}
@@ -60,6 +63,7 @@ function App() {
           }}
         />
       )}
+
       {step === "card" && (
         <CardStep
           onBack={() => setStep("email")}
@@ -67,9 +71,30 @@ function App() {
             bridge.success(session);
             setStep("success");
           }}
+          onFatalError={(message) => {
+            bridge.error(session, "card_declined", message);
+            setErrorMessage(message);
+            setStep("error");
+          }}
         />
       )}
-      {step === "success" && <p>Payment successful for {email}. 🎉</p>}
+
+      {step === "success" && (
+        <ResultStep
+          status="success"
+          email={email}
+          onClose={() => bridge.closed(session, "success")}
+        />
+      )}
+
+      {step === "error" && (
+        <ResultStep
+          status="error"
+          email={email}
+          errorMessage={errorMessage ?? undefined}
+          onClose={() => bridge.closed(session, "error")}
+        />
+      )}
     </div>
   );
 }

@@ -4,11 +4,12 @@ import { chargeCard } from "../lib/fakePayment";
 type Props = {
   onSuccess: () => void;
   onBack: () => void;
+  onFatalError: (message: string) => void;
 };
 
 type Phase = "idle" | "processing" | "error";
 
-export function CardStep({ onSuccess, onBack }: Props) {
+export function CardStep({ onSuccess, onBack, onFatalError }: Props) {
   const [cardNumber, setCardNumber] = useState("");
   const [phase, setPhase] = useState<Phase>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -17,7 +18,6 @@ export function CardStep({ onSuccess, onBack }: Props) {
   const isValidLength = cardNumber.replace(/\s+/g, "").length === 16;
 
   async function handlePay() {
-    // Guard against double-click: ignore a second Pay while one is in flight.
     if (phase === "processing") return;
 
     setPhase("processing");
@@ -27,6 +27,11 @@ export function CardStep({ onSuccess, onBack }: Props) {
 
     if (result.ok) {
       onSuccess();
+      return;
+    }
+
+    if (!result.canRetry) {
+      onFatalError(result.message);
       return;
     }
 
@@ -52,15 +57,11 @@ export function CardStep({ onSuccess, onBack }: Props) {
         maxLength={19}
       />
 
-      {phase === "error" && errorMsg && (
-        <p className="field-error">
-          {errorMsg} {canRetry && "You can try again."}
-        </p>
-      )}
+      {phase === "error" && errorMsg && <p className="field-error">{errorMsg} You can try again.</p>}
 
       <button
         className="btn btn--primary"
-        disabled={!isValidLength || phase === "processing" || (phase === "error" && !canRetry)}
+        disabled={!isValidLength || phase === "processing"}
         onClick={handlePay}
       >
         {phase === "processing" ? "Processing…" : "Pay"}
