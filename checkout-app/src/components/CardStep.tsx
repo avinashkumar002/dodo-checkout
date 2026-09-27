@@ -13,7 +13,6 @@ export function CardStep({ onSuccess, onBack, onFatalError }: Props) {
   const [cardNumber, setCardNumber] = useState("");
   const [phase, setPhase] = useState<Phase>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [canRetry, setCanRetry] = useState(true);
 
   const isValidLength = cardNumber.replace(/\s+/g, "").length === 16;
 
@@ -37,7 +36,6 @@ export function CardStep({ onSuccess, onBack, onFatalError }: Props) {
 
     setPhase("error");
     setErrorMsg(result.message);
-    setCanRetry(result.canRetry);
   }
 
   return (
